@@ -13,6 +13,8 @@
 
 <script type="text/javascript">
 
+// http://dev.openlayers.org/examples/wfs-states.html
+
 var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
     renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
 var vectorLayer = new OpenLayers.Layer.Vector("States", {
@@ -34,6 +36,11 @@ var map = new OpenLayers.Map({
 						"OpenLayers WMS",
 						"http://vmap0.tiles.osgeo.org/wms/vmap0",
 						{layers: "basic"}
+					),
+					new OpenLayers.Layer.WMS("States WMS",
+						"http://demo.boundlessgeo.com/geoserver/wms",
+						{layers: "topp:states", format: "image/png", transparent: true},
+						{maxScale: 15000000}
 					),
 					new OpenLayers.Layer.WMS(
 						"World Map",

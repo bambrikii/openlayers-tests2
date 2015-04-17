@@ -1,0 +1,59 @@
+Access-Control-Allow-Cred...	
+true
+Content-Disposition	
+inline; filename=geoserver-GetFeature.text
+Content-Encoding	
+gzip
+Content-Type	
+text/xml; subtype=gml/2.1.2
+Date	
+Sat, 18 Apr 2015 05:50:25 GMT
+Server	
+Apache-Coyote/1.1
+Transfer-Encoding	
+chunked
+access-control-allow-orig...	
+null
+
+
+Accept	
+text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding	
+gzip, deflate
+Accept-Language	
+en-US,en;q=0.5
+Cache-Control	
+no-cache
+Connection	
+keep-alive
+Content-Length	
+679
+Content-Type	
+application/xml; charset=UTF-8
+Host	
+demo.boundlessgeo.com
+Origin	
+null
+Pragma	
+no-cache
+User-Agent	
+Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:37.0) Gecko/20100101 Firefox/37.0
+X-Requested-With	
+XMLHttpRequest
+
+
+<wfs:GetFeature xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0" xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.0.0/WFS-transaction.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<wfs:Query typeName="feature:states" xmlns:feature="http://www.openplans.org/topp">
+<ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
+<ogc:BBOX>
+<ogc:PropertyName>the_geom</ogc:PropertyName>
+<gml:Box xmlns:gml="http://www.opengis.net/gml" srsName="EPSG:4326">
+<gml:coordinates decimal="." cs="," ts=" ">-162.2021484375,12.12890625 -26.6748046875,66.62109375</gml:coordinates>
+</gml:Box>
+</ogc:BBOX>
+</ogc:Filter>
+</wfs:Query>
+</wfs:GetFeature>
+
+
+
