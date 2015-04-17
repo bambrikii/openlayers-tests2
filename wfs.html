@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<link rel="stylesheet" location="bower_components/openlayers/theme/default/style.css" >
+		<script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+		<script type="text/javascript" src="bower_components/openlayers/lib/OpenLayers.js"></script>
+	</head>
+	<body>
+
+<div style="width: 100%; height: 100%; background-color: #aeaeae;">
+<div id="map-id">
+</div>
+</div>
+
+<script type="text/javascript">
+
+var map = new OpenLayers.Map({
+				div: "map-id",
+				layers: [
+					new OpenLayers.Layer.WMS(
+						"OpenLayers WMS",
+						"http://vmap0.tiles.osgeo.org/wms/vmap0",
+						{layers: "basic"}
+					),
+					new OpenLayers.Layer.WMS(
+						"World Map",
+						"http://maps.opengeo.org/geowebcache/service/wms",
+						{layers: "bluemarble"}
+					)
+				],
+				center: new OpenLayers.LonLat(0, 0),
+				zoom: 3
+		});
+map.addControl( new OpenLayers.Control.LayerSwitcher() );
+//var layer1 = new OpenLayers.Layer.Google("Google Layer", { sphericalMercator: true});
+//map.addLayer(layer1);
+
+
+</script>
+	</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "openlayers",
+  "version": "0.0.0",
+  "authors": [
+    "Ալեքսանդր Առաքելյան <bambrikii@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "openlayers": "*",
+    "jquery": "~2.1.3"
+  }
+}
