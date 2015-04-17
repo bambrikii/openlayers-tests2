@@ -13,20 +13,6 @@
 
 <script type="text/javascript">
 
-var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
-    renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
-var vectorLayer = new OpenLayers.Layer.Vector("States", {
-                minScale: 15000000,
-                strategies: [new OpenLayers.Strategy.BBOX()],
-                protocol: new OpenLayers.Protocol.WFS({
-                    url: "http://demo.boundlessgeo.com/geoserver/wfs",
-                    featureType: "states",
-                    featureNS: "http://www.openplans.org/topp"
-                }),
-                renderers: renderer
-            })
-
-
 var map = new OpenLayers.Map({
 				div: "map-id",
 				layers: [
@@ -39,8 +25,7 @@ var map = new OpenLayers.Map({
 						"World Map",
 						"http://maps.opengeo.org/geowebcache/service/wms",
 						{layers: "bluemarble"}
-					),
-					vectorLayer
+					)
 				],
 				center: new OpenLayers.LonLat(0, 0),
 				zoom: 3
