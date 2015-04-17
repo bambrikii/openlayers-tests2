@@ -13,6 +13,8 @@
 
 <script type="text/javascript">
 
+// http://dev.openlayers.org/examples/wfs-states.html
+
 var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
     renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
 var vectorLayer = new OpenLayers.Layer.Vector("States", {
