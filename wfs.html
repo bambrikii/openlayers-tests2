@@ -15,6 +15,8 @@
 
 // http://dev.openlayers.org/examples/wfs-states.html
 
+//OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
+
 var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
     renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
 var vectorLayer = new OpenLayers.Layer.Vector("States", {
@@ -26,7 +28,19 @@ var vectorLayer = new OpenLayers.Layer.Vector("States", {
                     featureNS: "http://www.openplans.org/topp"
                 }),
                 renderers: renderer
-            })
+            });
+
+var maLayer = new OpenLayers.Layer.Vector("MaStreets", {
+			strategies: [new OpenLayers.Strategy.BBOX()],
+			protocol: new OpenLayers.Protocol.WFS({
+				url : "http://localhost:88/geoserver/wfs",
+				featureType : "tiger_roads",
+				featureNS : "http://www.census.gov",
+				geometryName : "the_geom"
+			}),
+			renderers: renderer
+		});
+
 
 
 var map = new OpenLayers.Map({
@@ -47,7 +61,8 @@ var map = new OpenLayers.Map({
 						"http://maps.opengeo.org/geowebcache/service/wms",
 						{layers: "bluemarble"}
 					),
-					vectorLayer
+					vectorLayer,
+					maLayer
 				],
 				center: new OpenLayers.LonLat(0, 0),
 				zoom: 3
