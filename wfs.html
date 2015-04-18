@@ -6,16 +6,18 @@
 	</head>
 	<body>
 
-<div style="width: 100%; height: 100%; background-color: #aeaeae;">
-<div id="map-id">
+<div style="width: 100%; height: 90%; background-color: #aeaeae;">
+	<div id="map-id"></div>
 </div>
-</div>
+	<form>
+		<input type="text" name="cql" value="NAME LIKE '.*22.*St.*'" />
+		<input type="button" name="apply_cql" value="Apply CQL" />
+		<div name="cql_error"></div>
+	</form>
 
 <script type="text/javascript">
 
 // http://dev.openlayers.org/examples/wfs-states.html
-
-//OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
 
 var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
     renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
@@ -30,6 +32,14 @@ var vectorLayer = new OpenLayers.Layer.Vector("States", {
                 renderers: renderer
             });
 
+var maRule = new OpenLayers.Rule({
+    symbolizer: {
+        fillColor: "#ff0000",
+        strokeColor: "#ffcccc",
+        fillOpacity: "0.5"
+    }
+});
+
 var maLayer = new OpenLayers.Layer.Vector("MaStreets", {
 			strategies: [new OpenLayers.Strategy.BBOX()],
 			protocol: new OpenLayers.Protocol.WFS({
@@ -38,9 +48,30 @@ var maLayer = new OpenLayers.Layer.Vector("MaStreets", {
 				featureNS : "http://www.census.gov",
 				geometryName : "the_geom"
 			}),
-			renderers: renderer
+			renderers: renderer,
+			styleMap :  new OpenLayers.StyleMap({
+						"default" : new OpenLayers.Style(null, { rules: [ maRule ] })
+					})
 		});
 
+var format = new OpenLayers.Format.CQL();
+
+$("form input[type='button'][name='apply_cql']").click(function () {
+	var cql = $("form input[name='cql']").val();
+	var messageElem = $("form div[name='cql_error']");
+	var filter;
+	try {
+		filter = format.read(cql);
+	} catch (err) {
+		messageElem.html(err.message);
+	}
+	if (filter) {
+		messageElem.html("filter applied");
+		maRule.filter = filter;
+		maLayer.redraw();
+	}
+	messageElem.html(messageElem.html() + ". " + new Date());
+});
 
 
 var map = new OpenLayers.Map({
@@ -49,27 +80,32 @@ var map = new OpenLayers.Map({
 					new OpenLayers.Layer.WMS(
 						"OpenLayers WMS",
 						"http://vmap0.tiles.osgeo.org/wms/vmap0",
-						{layers: "basic"}
+						{ layers: "basic" }
 					),
 					new OpenLayers.Layer.WMS("States WMS",
 						"http://demo.boundlessgeo.com/geoserver/wms",
-						{layers: "topp:states", format: "image/png", transparent: true},
-						{maxScale: 15000000}
+						{ layers: "topp:states", format: "image/png", transparent: true },
+						{ maxScale: 15000000 }
 					),
 					new OpenLayers.Layer.WMS(
 						"World Map",
 						"http://maps.opengeo.org/geowebcache/service/wms",
-						{layers: "bluemarble"}
+						{ layers: "bluemarble" }
 					),
 					vectorLayer,
 					maLayer
 				],
-				center: new OpenLayers.LonLat(0, 0),
-				zoom: 3
+				// center: new OpenLayers.LonLat(0, 0),
+				//zoom: 3
+				center : new OpenLayers.LonLat(-74.0059, 40.7127),
+				zoom : 13
 		});
 map.addControl( new OpenLayers.Control.LayerSwitcher() );
 //var layer1 = new OpenLayers.Layer.Google("Google Layer", { sphericalMercator: true});
 //map.addLayer(layer1);
+
+$(document).ready(function () {
+});
 
 
 </script>
