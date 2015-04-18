@@ -54,24 +54,6 @@ var maLayer = new OpenLayers.Layer.Vector("MaStreets", {
 					})
 		});
 
-var format = new OpenLayers.Format.CQL();
-
-$("form input[type='button'][name='apply_cql']").click(function () {
-	var cql = $("form input[name='cql']").val();
-	var messageElem = $("form div[name='cql_error']");
-	var filter;
-	try {
-		filter = format.read(cql);
-	} catch (err) {
-		messageElem.html(err.message);
-	}
-	if (filter) {
-		messageElem.html("filter applied");
-		maRule.filter = filter;
-		maLayer.redraw();
-	}
-	messageElem.html(messageElem.html() + ". " + new Date());
-});
 
 
 var map = new OpenLayers.Map({
@@ -103,6 +85,27 @@ var map = new OpenLayers.Map({
 map.addControl( new OpenLayers.Control.LayerSwitcher() );
 //var layer1 = new OpenLayers.Layer.Google("Google Layer", { sphericalMercator: true});
 //map.addLayer(layer1);
+
+var format = new OpenLayers.Format.CQL();
+$("form input[type='button'][name='apply_cql']").click(function () {
+	var cql = $("form input[name='cql']").val();
+	var messageElem = $("form div[name='cql_error']");
+	var filter;
+	try {
+		filter = format.read(cql)
+		// http://gis.stackexchange.com/questions/31323/openlayers-zoom-to-vector-layer-extent
+		map.zoomToExtent(maLayer.getDataExtent());;
+	} catch (err) {
+		messageElem.html(err.message);
+	}
+	if (filter) {
+		messageElem.html("filter applied");
+		maRule.filter = filter;
+		maLayer.redraw();
+	}
+	messageElem.html(messageElem.html() + ". " + new Date());
+});
+
 
 $(document).ready(function () {
 });
