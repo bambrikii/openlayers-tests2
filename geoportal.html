@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Map</title>
+<link rel="stylesheet" href="bower_components/openlayers/theme/default/style.css" type="text/css">
+<style>
+#map-id {
+width: 512px;
+height: 256px;
+}
+</style>
+<script src="bower_components/openlayers/lib/OpenLayers.js"></script>
+</head>
+<body>
+<h1>My Map</h1>
+<div id="map-id"></div>
+
+<div id="map-geoid"></div>
+
+<script>
+
+var nyc = new OpenLayers.Bounds(
+-74.032, 40.685,
+-73.902, 40.876
+);
+
+
+var map = new OpenLayers.Map("map-id", {
+//	restrictedExtent: nyc,
+//	numZoomLevels: 5
+});
+var imagery = new OpenLayers.Layer.WMS(
+	"Geoportal Imagery",
+//	"http://geoportal.sovzond.ru/rt/pokaz/?isCompact=true"//,
+//"http://eipg.o7.com/geoserver/rtk/wms",
+//"http://213.167.32.24:6080/arcgis/rest/services/Armavir/Armavir_map/MapServer/WMS"
+"http://sampleserver6.arcgisonline.com/arcgis/rest/services/WorldTimeZones/MapServer/WMSServer",
+{layers: "openstreetmap", format: "image/png"}
+);
+map.addLayer(imagery);
+map.zoomToMaxExtent();
+var center = new OpenLayers.LonLat(45, 42);
+map.setCenter(center,4);
+
+
+</script>
+
+</body>
+</html>

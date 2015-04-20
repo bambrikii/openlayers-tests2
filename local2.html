@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Map</title>
+<link rel="stylesheet" href="bower_components/openlayers/theme/default/style.css" type="text/css">
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/openlayers/lib/OpenLayers.js"></script>
+<style type="text/css">
+#map-id {
+	width: 100%;
+	height: 100%;
+}
+.my-map-container {
+	width: 100%;
+	height: 95%;
+	background: #dedede;
+	vertical-align: center;
+	horizontal-align: center;
+}
+html {
+	height: 90%;
+}
+body {
+	width: 90%;
+	height: 90%;
+	background-color: #eeeeee;
+	position:relative;
+	padding: 0px;
+}
+</style>
+</head>
+<body>
+	<h1>My Map</h1>
+<div class="my-map-container">
+	<div id="map-id"></div>
+</div>
+<script type="text/javascript">
+
+var map = new OpenLayers.Map("map-id", {
+//projection: new OpenLayers.Projection('EPSG:3857')
+});
+
+var imageryBlueMarble = new OpenLayers.Layer.WMS(
+	"Global Imagery",
+	"http://maps.opengeo.org/geowebcache/service/wms",
+	{layers: "bluemarble"},
+	{isBaseLayer: true}
+);
+var imageryOpenStreetMap = new OpenLayers.Layer.WMS(
+"Global Imagery",
+"http://maps.opengeo.org/geowebcache/service/wms",
+{layers: "openstreetmap", format: "image/png"},
+{isBaseLayer: true}
+
+);
+
+
+var imagery1 = new OpenLayers.Layer.WMS(
+	"Local GeoServer Imagery",
+	"http://localhost:8082/geoserver/showLands/wms",
+	{
+		layers: "showLands:ZU_Zvenigorod_Odincovo",
+		format: "image/png",
+		transparent: 'true'
+	},
+	{isBaseLayer: false}
+);
+var imagery2 = new OpenLayers.Layer.WMS(
+	"Local GeoServer Imagery",
+	"http://localhost:8082/geoserver/showLands/wms",
+	{
+		layers: "showLands:Lands_09_14",
+		format: "image/png",
+		transparent: 'true'
+	}
+);
+var imagery3 = new OpenLayers.Layer.WMS(
+	"Local GeoServer Imagery",
+	"http://localhost:8082/geoserver/showLands/wms",
+	{
+		layers: "showLands:Lands_09_14_Zvenigorod",
+		format: "image/png",
+		transparent: 'true'
+	}//,
+);
+map.addLayer(imageryOpenStreetMap);
+map.addLayer(imageryBlueMarble);
+map.addLayer(imagery1);
+map.addLayer(imagery2);
+map.addLayer(imagery3);
+
+// ---------------
+var points = [
+    new OpenLayers.Geometry.Point(36.3, 55.5),
+    new OpenLayers.Geometry.Point(37.5, 55.5),
+    new OpenLayers.Geometry.Point(37.5, 55.9),
+    new OpenLayers.Geometry.Point(36.3, 55.9)
+];
+var ring = new OpenLayers.Geometry.LinearRing(points);
+var polygon = new OpenLayers.Geometry.Polygon([ring]);
+
+var attributes = {name: "my name", bar: "foo"};
+var feature = new OpenLayers.Feature.Vector(polygon, attributes);
+
+var attributes2 = {name: "feature2", bar: "foo2"};
+//var feature2 = new OpenLayers.Feature.Circle(attributes2),
+
+var point = new OpenLayers.Geometry.Point(36.9, 55.7);
+var mycircle = OpenLayers.Geometry.Polygon.createRegularPolygon(point, 50000, 40, 0);
+var featurecircle = new OpenLayers.Feature.Vector(mycircle);
+
+var featurePoint = new OpenLayers.Feature.Vector(
+    point,
+    { description: 'info' },
+    { externalGraphic: 'http://localhost:8082/geoserver/web/resources/org.geoserver.web.GeoServerBasePage/img/logo.png', graphicWidth: 82 }
+);
+
+
+var layerWithFeatures = new OpenLayers.Layer.Vector("Test");
+layerWithFeatures.addFeatures([feature, featurePoint, featurecircle]);
+map.addLayer(layerWithFeatures);
+
+// --- markers
+            var markers = new OpenLayers.Layer.Markers( "Markers" );
+            map.addLayer(markers);
+		var size = new OpenLayers.Size(21,25);
+            var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+            var icon = new OpenLayers.Icon('http://dev.openlayers.org/img/marker.png',size,offset);
+
+            markers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(36.3,55.5),icon.clone()));
+
+		var marker2 = new OpenLayers.Marker(new OpenLayers.LonLat(36.5,55.5), icon.clone());
+		marker2.setOpacity(0.5);
+		marker2.events.register('mousedown', marker2, function(evt) { alert(this.icon.url); OpenLayers.Event.stop(evt); });
+            markers.addMarker(marker2); 
+            
+// ---
+
+
+map.addControl(new OpenLayers.Control.LayerSwitcher());
+//map.addControl(new OpenLayers.Control.PanZoomBar());
+//map.addControl(new OpenLayers.Control.LayerSwitcher({'ascending':false}));
+//map.addControl(new OpenLayers.Control.Permalink());
+//map.addControl(new OpenLayers.Control.Permalink('permalink'));
+map.addControl(new OpenLayers.Control.MousePosition());
+//map.addControl(new OpenLayers.Control.OverviewMap());
+map.addControl(new OpenLayers.Control.KeyboardDefaults());
+//map.zoomToMaxExtent();
+//var centerArmavir = new OpenLayers.LonLat(41.07, 45.00);
+
+var centerOdintsovo = new OpenLayers.LonLat(36.91, 55.64);
+map.setCenter(centerOdintsovo,9);
+
+</script>
+
+<script type="text/javascript">
+</script>
+
+</body>
+</html>

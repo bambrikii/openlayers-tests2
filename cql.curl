@@ -1,0 +1,4 @@
+POST /geoserver/wfs HTTP/1.1
+Host: localhost:8082
+Origin: http://asd-pc:3000
+X-Requested-With: XMLHttpRequest

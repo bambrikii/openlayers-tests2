@@ -1,0 +1,61 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="bower_components/openlayers/theme/default/style.css" type="text/css">
+		<script src="bower_components/jquery/dist/jquery.js"></script>
+		<script src="bower_components/openlayers/lib/OpenLayers.js"></script>
+		<!--<script type="text/javascript" src="mgis.js"></script>-->
+	</head>
+	<body>
+<style type="text/css">
+#map-id {
+	width: 500px;
+	height: 300px;
+}
+body {
+	background-color: #d8d8d8;
+}
+</style>
+http://213.167.32.24:6080/arcgis/rest/services/Armavir/Armavir_map/MapServer
+
+		<div id="map-id" width="500" height="300"></div>
+<script type="text/javascript">
+	var layerURL = "http://213.167.32.24:6080/arcgis/rest/services/Armavir/Armavir_map/MapServer";
+	var map = new OpenLayers.Map('map-id', {	projection: new OpenLayers.Projection('EPSG:3857')
+			});
+	var imageryOpenStreetMap = new OpenLayers.Layer.WMS(
+			"Global Imagery",
+			"http://maps.opengeo.org/geowebcache/service/wms",
+			{layers: "openstreetmap", format: "image/png"},
+			{isBaseLayer: true}
+		);
+	//map.addLayer(imageryOpenStreetMap);
+	var armavirLayer = new OpenLayers.Layer.ArcGISCache("Armavir Layer", "http://213.167.32.24:6080/arcgis/services/Armavir/Armavir_map/MapServer/WMSServer", {
+            layers : "0",
+            format : "image/png32",
+            transparent : "true"		
+        });
+	map.addLayer(armavirLayer);
+
+
+var imagery3 = new OpenLayers.Layer.WMS(
+	"Local GeoServer Imagery",
+	"http://localhost:8082/geoserver/showLands/wms",
+	{
+		layers: "showLands:Lands_09_14_Zvenigorod",
+		format: "image/png",
+		transparent: 'true'
+	}//,
+);
+map.addLayer(imagery3);
+	map.addControl(new OpenLayers.Control.LayerSwitcher());
+	map.addControl(new OpenLayers.Control.MousePosition());
+	map.addControl(new OpenLayers.Control.KeyboardDefaults());
+
+var centerOdintsovo = new OpenLayers.LonLat(4102296, 7504600);
+map.setCenter(centerOdintsovo,11);
+
+
+</script>
+
+	</body>
+</html>

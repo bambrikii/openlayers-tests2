@@ -1,0 +1,161 @@
+<html>
+	<head>
+<link rel="stylesheet" href="bower_components/openlayers/theme/default/style.css" type="text/css">
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/openlayers/lib/OpenLayers.js"></script>
+<style type="text/css">
+#map-id {
+	width: 100%;
+	height: 100%;
+}
+.my-map-container {
+	width: 100%;
+	height: 95%;
+	background: #dedede;
+	vertical-align: center;
+	horizontal-align: center;
+}
+html {
+	height: 90%;
+}
+body {
+	width: 90%;
+	height: 90%;
+	background-color: #eeeeee;
+	position:relative;
+	padding: 0px;
+}
+</style>
+	</head>
+	<body>
+<div class="my-map-container">
+	<div id="map-id"></div>
+</div>
+<script type="text/javascript">
+
+var map = new OpenLayers.Map("map-id", {
+	projection: new OpenLayers.Projection('EPSG:3857')
+});
+
+map.addControl(new OpenLayers.Control.LayerSwitcher());
+map.addControl(new OpenLayers.Control.MousePosition());
+map.addControl(new OpenLayers.Control.KeyboardDefaults());
+
+var imageryOpenStreetMap = new OpenLayers.Layer.WMS(
+"Global Imagery",
+"http://maps.opengeo.org/geowebcache/service/wms",
+{layers: "openstreetmap", format: "image/png"},
+{isBaseLayer: true}
+
+);
+map.addLayer(imageryOpenStreetMap);
+
+
+var centerOdintsovo = new OpenLayers.LonLat(4102296, 7504600);
+map.setCenter(centerOdintsovo,11);
+/*
+var center = new OpenLayers.LonLat(0, 0);
+map.setCenter(center,11);
+*/
+// ---
+
+var rule = new OpenLayers.Rule({
+    symbolizer: {
+        fillColor: "#ff0000",
+        strokeColor: "#ffcccc",
+        fillOpacity: "0.5"
+    }    
+});
+var landsLayer1 = new OpenLayers.Layer.Vector("Lands", {
+    styleMap: new OpenLayers.StyleMap({
+        "default": new OpenLayers.Style(null, {rules: [rule]})
+    })
+});
+var landsLayer = new OpenLayers.Layer.WMS(
+	"Local GeoServer Imagery",
+	"http://localhost:8082/geoserver/showLands/wms",
+	{
+		layers: "showLands:Lands_09_14_Zvenigorod",
+		format: "image/png",
+		transparent: 'true',
+		styleMap: new OpenLayers.StyleMap({
+			"default": new OpenLayers.Style(null, {rules: [rule]})
+		})
+	}
+);
+//map.addLayer(landsLayer);
+
+var landsVectorParams =
+ 	{
+		strategies : [new OpenLayers.Strategy.BBOX()],/*
+		protocol: new OpenLayers.Protocol.Script({
+			url: 	"http://localhost:8082/geoserver/showLands/wfs",
+			callbackKey: "format_options",
+			callbackPrefix: "callback:",
+			params: {
+				service: "WFS",
+				version: "1.1.0",
+				srsName: "EPSG:3857",
+				request: "GetFeature",
+				typeName: "showLands:Lands_09_14",
+				outputFormat: "json"
+			},
+
+			filterToParams: function(filter, params) {
+				if (filter.type === OpenLayers.Filter.Spatial.BBOX) {
+				params.bbox = filter.value.toArray();
+					if (filter.projection) {
+						params.bbox.push(filter.projection.getCode());
+					}
+				}
+				return params;
+			}
+
+		}),*/
+/*
+protocol: new OpenLayers.Protocol.Script({
+                        url : "cql.json",
+                        format : new OpenLayers.Format.GeoJSON(),
+			callback: function (data) {
+				console.log(JSON.stringify(data));
+			}
+                    }),
+*/
+		styleMap: new OpenLayers.StyleMap({
+                    strokeWidth : 3,
+                    strokeColor : "#f00"
+                })
+	};
+var landsVectorLayer = new OpenLayers.Layer.Vector("Local GeoServer Imagery", landsVectorParams);
+map.addLayer(landsVectorLayer);
+
+/*
+function loadFeatures(data) {
+	var features = new OpenLayers.Format.GeoJSON().read(data);
+	states.addFeatures(features);
+}
+*/
+function updateFeatures() {
+	var err = $("span[name='errors']");
+	var cql = $("input[name='cql']").val();
+	var format = new OpenLayers.Format.CQL();
+	var filter;
+	try {
+		filter = format.read(cql);
+	} catch (err) {
+		$("span[name='errors']").html("Error: " + err.message);
+	}
+	if (filter) {
+		err.html("filtered. " + new Date());
+		landsVectorParams.filter = filter;
+		landsVectorLayer.redraw();
+	}
+}
+</script>
+<form>
+	<input type="text" name="cql" size="160" />
+	<input type="button"  value="CQL" onclick="javascript:updateFeatures();" />
+	<span name="errors" >no errors yet</span>
+</form> 
+	</body>
+</html>

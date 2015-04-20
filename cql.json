@@ -1,0 +1,19 @@
+{
+	"type" : "FeatureCollection",
+	"crs" : "EPSG:3857",
+	"features" : [
+        	{
+			"type" : "Feature",
+			"properties" : {
+			"name" : "TRON-02",
+			"color" : "#f00",
+			"size" : 1500000
+		},
+		"geometry" :
+			{
+				"type": "Polygon",
+				"coordinates": [ [4102296, 7504600], [4102296, 7604600], [4202296, 7604600], [4202296, 7504600] ]
+			}
+		}
+	]
+}
