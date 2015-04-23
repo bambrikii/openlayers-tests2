@@ -1,0 +1,157 @@
+<html>
+	<head>
+<link rel="stylesheet" href="bower_components/openlayers/theme/default/style.css" type="text/css">
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/openlayers/lib/OpenLayers.js"></script>
+<style type="text/css">
+#map-id {
+	width: 100%;
+	height: 100%;
+}
+.my-map-container {
+	width: 100%;
+	height: 95%;
+	background: #dedede;
+	vertical-align: center;
+	horizontal-align: center;
+}
+html {
+	height: 90%;
+}
+body {
+	width: 90%;
+	height: 90%;
+	background-color: #eeeeee;
+	position:relative;
+	padding: 0px;
+}
+</style>
+	</head>
+	<body>
+<div class="my-map-container">
+	<div id="map-id"></div>
+</div>
+<script type="text/javascript">
+
+var map = new OpenLayers.Map("map-id", {
+	projection: new OpenLayers.Projection('EPSG:3857')
+});
+
+map.addControl(new OpenLayers.Control.LayerSwitcher());
+map.addControl(new OpenLayers.Control.MousePosition());
+map.addControl(new OpenLayers.Control.KeyboardDefaults());
+
+var defaultCenter = new OpenLayers.LonLat(0, 0);
+var imageryOpenStreetMap = new OpenLayers.Layer.WMS(
+	"Global Imagery",
+	"http://maps.opengeo.org/geowebcache/service/wms",
+	{layers: "openstreetmap", format: "image/png"},
+	{
+ 		projection: new OpenLayers.Projection("EPSG:3857"),
+		isBaseLayer: true//,
+		//center : defaultCenter,
+		//zoom : 5
+	}
+);
+map.addLayer(imageryOpenStreetMap);
+
+
+// ---
+	     	var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
+	     	    renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
+
+	     	var showLandsRule = new OpenLayers.Rule({
+	     	    symbolizer: {
+	     	        fillColor: "#ffaaaa",
+	     	        strokeColor: "#111111",
+	     	        fillOpacity: "0.5"
+	     	    }
+	     	});
+
+		var showLandsWfs = new OpenLayers.Protocol.WFS({
+					version: "1.1.0",
+					//srsName: "EPSG:2264",
+					srsName : "EPSG:3857",
+ 					url : "http://localhost:8085/geoserver/wfs",
+ 					featureType : "ZU_Zvenigorod_Odincovo",
+ 					featureNS : "showLands",
+ 					geometryName : "the_geom"
+ 				});
+
+		var showLandsRefreshStrategy = new OpenLayers.Strategy.Refresh({force: true, active: true});
+		var showLandsParams = {
+ 				strategies: [new OpenLayers.Strategy.BBOX(), showLandsRefreshStrategy],
+ 				protocol: showLandsWfs,
+ 				renderers: renderer,
+ 				styleMap : new OpenLayers.StyleMap({
+ 							"default" : new OpenLayers.Style(null, { rules: [ showLandsRule ] })
+ 						}),
+ 				filter : new OpenLayers.Filter.Logical({
+								type: OpenLayers.Filter.Logical.OR,
+								filters: [
+									new OpenLayers.Filter.Comparison({
+										type: OpenLayers.Filter.Comparison.LIKE,
+										property: "CadastralNumber",
+										value: "50:49:0010101:1"
+ 				                			})
+ 								]
+ 				        }),
+ 				projection: new OpenLayers.Projection("EPSG:3857")
+ 			};
+	     	var showLandsLayer = new OpenLayers.Layer.Vector("ShowLandsLayer", showLandsParams);
+
+map.addLayer(showLandsLayer);
+
+//map.panTo(defaultCenter);
+//map.zoomToExtent();
+map.setCenter(showLandsLayer.getExtent());
+//map.setZoom(5);
+
+
+/*
+function loadFeatures(data) {
+	var features = new OpenLayers.Format.GeoJSON().read(data);
+	states.addFeatures(features);
+}
+*/
+
+showLandsLayer.events.on({
+	beforefeatureadded : function (event) {
+		var bounds = event.feature.geometry.getBounds();
+var proj2180 = new OpenLayers.Projection("EPSG:2180");
+var proj4326 = new OpenLayers.Projection("EPSG:4326");
+bounds = bounds.transform(proj4326, proj2180);
+		console.log(	"layer.extent     : " + JSON.stringify(showLandsLayer.getExtent()) +
+				"\nmap.extent       : " + JSON.stringify(map.getExtent()) +
+				"\nzooming to extent: " + JSON.stringify(bounds)
+			);
+		map.zoomToExtent(bounds, true);
+	}
+});
+
+function updateFeatures() {
+	var err = $("span[name='errors']");
+	var cql = $("input[name='cql']").val();
+	var format = new OpenLayers.Format.CQL();
+	var filter;
+	try {
+		console.log("filtering started...");
+		filter = format.read(cql);
+		err.html("filtered. " + new Date());
+		showLandsLayer.filter = filter;
+		console.log("refreshing ... ");
+		showLandsRefreshStrategy.refresh();
+		showLandsLayer.redraw();
+	} catch (err) {
+		console.log("filtering error... " + err.message);
+		$("span[name='errors']").html("Error: " + err.message);
+	}
+}
+</script>
+<form>
+	<input type="text" name="cql" size="160" value="CadastralNumber LIKE '50:49:0010101:1'" />
+	<input type="button"  value="CQL" onclick="javascript:updateFeatures();" />
+	<span name="errors" >no errors yet</span>
+</form> 
+	</body>
+</html>
