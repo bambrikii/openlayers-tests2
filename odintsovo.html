@@ -43,18 +43,31 @@ map.addControl(new OpenLayers.Control.KeyboardDefaults());
 
 var defaultCenter = new OpenLayers.LonLat(0, 0);
 var imageryOpenStreetMap = new OpenLayers.Layer.WMS(
-	"Global Imagery",
+	"OpenStreetMap",
 	"http://maps.opengeo.org/geowebcache/service/wms",
 	{layers: "openstreetmap", format: "image/png"},
 	{
- 		projection: new OpenLayers.Projection("EPSG:3857"),
+// 		projection: new OpenLayers.Projection("EPSG:3857"),
 		isBaseLayer: true//,
 		//center : defaultCenter,
 		//zoom : 5
 	}
 );
-map.addLayer(imageryOpenStreetMap);
+//map.addLayer(imageryOpenStreetMap);
 
+
+// ---
+var showLandsWmsLayer = new OpenLayers.Layer.WMS(
+	"ShowLands",
+	"http://localhost:8082/geoserver/showLands/wms",
+	{
+		layers: "showLands:ZU_Zvenigorod_Odincovo",
+		format: "image/png",
+		transparent: 'true'
+	},
+	{isBaseLayer: true}
+);
+map.addLayer(showLandsWmsLayer);
 
 // ---
 	     	var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
@@ -63,14 +76,13 @@ map.addLayer(imageryOpenStreetMap);
 	     	var showLandsRule = new OpenLayers.Rule({
 	     	    symbolizer: {
 	     	        fillColor: "#ffaaaa",
-	     	        strokeColor: "#111111",
+	     	        strokeColor: "#ff1111",
 	     	        fillOpacity: "0.5"
 	     	    }
 	     	});
 
 		var showLandsWfs = new OpenLayers.Protocol.WFS({
 					version: "1.1.0",
-					//srsName: "EPSG:2264",
 					srsName : "EPSG:3857",
  					url : "http://localhost:8085/geoserver/wfs",
  					featureType : "ZU_Zvenigorod_Odincovo",
@@ -79,8 +91,13 @@ map.addLayer(imageryOpenStreetMap);
  				});
 
 		var showLandsRefreshStrategy = new OpenLayers.Strategy.Refresh({force: true, active: true});
+		var showLandsSaveStrategy = new OpenLayers.Strategy.Save();
 		var showLandsParams = {
- 				strategies: [new OpenLayers.Strategy.BBOX(), showLandsRefreshStrategy],
+ 				strategies: [
+						new OpenLayers.Strategy.BBOX(), 
+						showLandsRefreshStrategy//,
+//						showLandsSaveStrategy
+				],
  				protocol: showLandsWfs,
  				renderers: renderer,
  				styleMap : new OpenLayers.StyleMap({
@@ -114,10 +131,15 @@ function loadFeatures(data) {
 	states.addFeatures(features);
 }
 */
-
+/*
+showLandsSaveStrategy.events.register("success", null, function () {
+	console.log("save success + " + arguments);
+});
+*/
 showLandsLayer.events.on({
 	beforefeatureadded : function (event) {
 		var bounds = event.feature.geometry.getBounds();
+/*
 var proj2180 = new OpenLayers.Projection("EPSG:2180");
 var proj4326 = new OpenLayers.Projection("EPSG:4326");
 bounds = bounds.transform(proj4326, proj2180);
@@ -125,6 +147,7 @@ bounds = bounds.transform(proj4326, proj2180);
 				"\nmap.extent       : " + JSON.stringify(map.getExtent()) +
 				"\nzooming to extent: " + JSON.stringify(bounds)
 			);
+*/
 		map.zoomToExtent(bounds, true);
 	}
 });

@@ -43,7 +43,7 @@ var maRule = new OpenLayers.Rule({
 var maLayer = new OpenLayers.Layer.Vector("MaStreets", {
 			strategies: [new OpenLayers.Strategy.BBOX()],
 			protocol: new OpenLayers.Protocol.WFS({
-				url : "http://localhost:88/geoserver/wfs",
+				url : "http://localhost:8085/geoserver/wfs",
 				featureType : "tiger_roads",
 				featureNS : "http://www.census.gov",
 				geometryName : "the_geom"
